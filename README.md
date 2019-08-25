@@ -38,13 +38,14 @@ yarn lint
 
 ## Open tasks
 
+* add proper logging (debug log every function, error log not catched errors, json output, context for loggers)
 * improve linting
 * improve func naming
-* improve error handling
+* improve error handling (add error codes, own error class et)
 * add swagger doc
 * create server from swagger doc
 * add more JSDoc
-* add proper logging (debug, error, info etc)
+
 * create Dockerfile
 * create docker-compose files
 * create K8S files
