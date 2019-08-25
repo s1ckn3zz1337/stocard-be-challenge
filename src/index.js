@@ -1,28 +1,38 @@
 const { createContainer, asFunction, asValue } = require('awilix');
 const Joi = require('@hapi/joi');
 const restifyErrors = require('restify-errors');
+const restify = require('restify');
+const axios = require('axios');
 const { routeCities } = require('./route');
-const { modelCity, modelWeather } = require('./model');
-const { validate } = require('./middleware');
+const { ModelCity, ModelWeather } = require('./model');
+const { validate, cities } = require('./middleware');
+const { configApp } = require('./const');
+const { externalApiOpenWeather } = require('./external');
 const server = require('./server');
-
 
 const container = createContainer();
 container.register({
+  axios: asValue(axios),
   Joi: asValue(Joi),
   restifyErrors: asValue(restifyErrors),
+  restify: asValue(restify),
 
   server: asFunction(server).singleton(),
 
-  modelCity: asFunction(modelCity),
-  modelWeather: asFunction(modelWeather),
+  configApp: asValue(configApp),
+
+  ModelCity: asFunction(ModelCity),
+  ModelWeather: asFunction(ModelWeather),
 
   validate: asFunction(validate),
+  cities: asFunction(cities),
+
+  externalApiOpenWeather: asFunction(externalApiOpenWeather),
 
   routeCities: asFunction(routeCities),
 
 });
 
-const app = container.resolve('server');
+const app = container.resolve('server').start();
 
 module.exports = app;

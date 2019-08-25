@@ -1,7 +1,7 @@
-const modelCity = require('./City');
-const modelWeather = require('./Weather');
+const ModelCity = require('./City');
+const ModelWeather = require('./Weather');
 
 module.exports = {
-  modelCity,
-  modelWeather,
+  ModelCity,
+  ModelWeather,
 };

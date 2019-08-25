@@ -1,11 +1,55 @@
-const supertest = require('supertest');
+const request = require('supertest');
 const nock = require('nock');
 const app = require('../../src');
 
-const request = supertest(app);
+const { configApp: { openWeather: { appId } } } = require('../../src/const');
+
+const cityId = 2873891;
+const rawCityData = {
+  coord: {
+    lon: 8.46,
+    lat: 49.49,
+  },
+  weather: [
+    {
+      id: 800,
+      main: 'Clear',
+      description: 'clear sky',
+      icon: '01d',
+    },
+  ],
+  base: 'stations',
+  main: {
+    temp: 304.24,
+    pressure: 1017,
+    humidity: 31,
+    temp_min: 303.15,
+    temp_max: 305.37,
+  },
+  visibility: 10000,
+  wind: {
+    speed: 1.5,
+  },
+  clouds: {
+    all: 0,
+  },
+  dt: 1566746872,
+  sys: {
+    type: 1,
+    id: 1291,
+    message: 0.0086,
+    country: 'DE',
+    sunrise: 1566707478,
+    sunset: 1566757552,
+  },
+  timezone: 7200,
+  id: cityId,
+  name: 'Mannheim',
+  cod: 200,
+};
 
 describe('test cities route', () => {
-  descibe('test GET /cities route', () => {
+  describe('test GET /cities route', () => {
     it('should return 200 and expected body on succes if query is valid', async () => {
       nock('weatherstuff')
         .get('lat+lng')
@@ -47,19 +91,19 @@ describe('test cities route', () => {
         .expect(204, []);
     });
   });
-  descibe('test GET /cities/{city_id} route', () => {
-    it('should return right body and http 200 on success', async () => {
-      nock('citystuff')
-        .get('cityid')
-        .reply(200, {});
+  describe('test GET /cities/{city_id} route', () => {
+    it.only('should return right body and http 200 on success', async () => {
+      nock('https://api.openweathermap.org/')
+        .get(`/data/2.5/weather?id=${cityId}&appid=${appId}`)
+        .reply(200, rawCityData);
       await request(app)
-        .get('/cities')
+        .get(`/cities/${cityId}`)
         .expect('Content-Type', /json/)
         .expect(200, {
           id: 2873891,
           name: 'Mannheim',
-          lat: 49.488331,
-          lng: 8.46472,
+          lat: 49.49,
+          lng: 8.46,
         });
     });
     it('should return 404 if city not found', async () => {
@@ -75,7 +119,7 @@ describe('test cities route', () => {
         });
     });
   });
-  descibe('test GET /cities/{city_id}/weather route', () => {
+  describe('test GET /cities/{city_id}/weather route', () => {
     it('should return http 200 and right body on success', async () => {
       nock('citystuff')
         .get('city and weather stuff')

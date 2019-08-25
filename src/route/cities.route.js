@@ -1,27 +1,26 @@
-module.exports = ({ validate }) => ([
+module.exports = ({ validate, cities }) => ([
   {
     location: '/cities',
     method: 'get',
     middlewares: [
       validate,
-      // add getCities
+      cities.getCityByLanLng,
     ],
   },
   {
-    location: '/cities/$city_id',
+    location: '/cities/:city_id',
     method: 'get',
     middlewares: [
       validate,
-      cities
+      cities.getCityById,
     ],
   },
   {
-    location: '/cities/$city_id/weather',
+    location: '/cities/:city_id/weather',
     method: 'get',
     middlewares: [
       validate,
-      // add getCity
-      // add getWeather
+      cities.getWeatherByCityId,
     ],
   },
 ]);
