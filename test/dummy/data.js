@@ -369,7 +369,9 @@ const openWeatherCityListResponse = {
   ],
 };
 
-const cityIdExpected = {};
+const cityIdExpected = {
+  id: 2873891, name: 'Mannheim', lat: 49.49, lng: 8.46,
+};
 
 const openWeatherCityIdResponse = {
   coord: {

@@ -14,14 +14,19 @@ module.exports = ({ restify, routeCities, restifyErrors: { HttpError, InternalSe
       server.use(restify.plugins.bodyParser());
       server.on('uncaughtException', (req, res, route, err) => {
         // this is fired second.
-
-        res.send(err instanceof HttpError ? err : new InternalServerError(err));
+        const error = err instanceof HttpError ? err : new InternalServerError(err);
+        res.send(error.statusCode, { message: error.message, code: error.name });
       });
 
       this.addRoutes(server, [routeCities]);
 
       server.listen(8080, () => {
         console.log('%s listening at %s', server.name, server.url);
+      });
+      server.use((req, res, next) => {
+        res.setHeader('content-type', 'application/json');
+
+        next();
       });
       return server;
     }

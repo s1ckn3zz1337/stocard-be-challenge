@@ -1,22 +1,21 @@
-module.exports = ({ Joi }) => (req, res, next) => {
-  switch (req.url) {
-    case '/cities/{city_id}/weather':
+module.exports = ({ Joi, restifyErrors: { BadRequestError } }) => (req, res, next) => {
+  switch (true) {
+    case /\/cities\/\d*\/weather/.test(req.url):
       break;
-    case '/cities/{city_id}':
+    case /\/cities\/\d*/.test(req.url):
       break;
-    case '/cities':
+    case /\/cities\?\w/.test(req.url) || /\/cities\/*/.test(req.url):
       const citiesShema = Joi.object({
-        lng: Joi.number(),
-        lat: Joi.number(),
+        lng: Joi.number().required(),
+        lat: Joi.number().required(),
       });
       const { error, value } = citiesShema.validate(req.query);
       if (error) {
-        throw new Error(400, 'lat/lng required');
+        throw new BadRequestError('lat/lng required');
       }
       break;
-
     default:
-      //throw Error('not found');
+      throw Error('not found');
   }
   return next();
 };
