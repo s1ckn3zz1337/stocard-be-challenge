@@ -45,16 +45,23 @@ describe('test cities route', () => {
         });
     });
     it('should return 204 on no result', async () => {
-      nock('weatherstuff')
-        .get('lat+lng')
-        .reply(200, []);
+      nock('https://api.openweathermap.org/')
+        .get(`/data/2.5/find?lat=${cityLat}&lon=${cityLng}&appid=${appId}`)
+        .reply(200, { list: [] });
       await request(app)
-        .get('/cities')
-        .expect('Content-Type', /json/)
-        .expect(204, []);
+        .get(`/cities?lat=${cityLat}&lng=${cityLng}`)
+        .expect(204, {});
     });
     it('should return 500 on error', async () => {
-
+      nock('https://api.openweathermap.org/')
+        .get(`/data/2.5/find?lat=${cityLat}&lon=${cityLng}&appid=${appId}`)
+        .reply(500, {});
+      await request(app)
+        .get(`/cities?lat=${cityLat}&lng=${cityLng}`)
+        .expect(500, {
+          code: 'InternalServerError',
+          message: 'Hoops looks like something went wrong :(',
+        });
     });
   });
   describe('test GET /cities/{city_id} route', () => {
@@ -68,11 +75,11 @@ describe('test cities route', () => {
         .expect(200, cityIdExpected);
     });
     it('should return 404 if city not found', async () => {
-      nock('citystuff')
-        .get('cityid')
+      nock('https://api.openweathermap.org/')
+        .get(`/data/2.5/weather?id=${cityId}&appid=${appId}`)
         .reply(404, {});
       await request(app)
-        .get('/cities')
+        .get(`/cities/${cityId}`)
         .expect('Content-Type', /json/)
         .expect(404, {
           code: 'NotFoundError',
@@ -80,7 +87,16 @@ describe('test cities route', () => {
         });
     });
     it('should return 500 on error', async () => {
-
+      nock('https://api.openweathermap.org/')
+        .get(`/data/2.5/weather?id=${cityId}&appid=${appId}`)
+        .reply(500, {});
+      await request(app)
+        .get(`/cities/${cityId}`)
+        .expect('Content-Type', /json/)
+        .expect(500, {
+          code: 'InternalServerError',
+          message: 'Hoops looks like something went wrong :(',
+        });
     });
   });
   describe('test GET /cities/{city_id}/weather route', () => {
@@ -94,11 +110,11 @@ describe('test cities route', () => {
         .expect(200, cityIdWeatherExpected);
     });
     it('should return http 404 on not found', async () => {
-      nock('citystuff')
-        .get('city and weather stuff')
-        .reply(404);
+      nock('https://api.openweathermap.org/')
+        .get(`/data/2.5/weather?id=${cityId}&appid=${appId}`)
+        .reply(404, {});
       await request(app)
-        .get('/cities')
+        .get(`/cities/${cityId}/weather`)
         .expect('Content-Type', /json/)
         .expect(404, {
           code: 'NotFoundError',
@@ -106,7 +122,16 @@ describe('test cities route', () => {
         });
     });
     it('should return http 500 on error', async () => {
-
+      nock('https://api.openweathermap.org/')
+        .get(`/data/2.5/weather?id=${cityId}&appid=${appId}`)
+        .reply(500, {});
+      await request(app)
+        .get(`/cities/${cityId}/weather`)
+        .expect('Content-Type', /json/)
+        .expect(500, {
+          code: 'InternalServerError',
+          message: 'Hoops looks like something went wrong :(',
+        });
     });
   });
 });

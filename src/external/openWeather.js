@@ -20,7 +20,7 @@ module.exports = ({ axios, configApp: { openWeather: { appId } } }) => {
         });
         return data;
       } catch (err) {
-        console.error('could not load city by lng lat', err);
+        console.error('could not load city by lng lat');
         throw (err);
       }
     },
@@ -40,7 +40,7 @@ module.exports = ({ axios, configApp: { openWeather: { appId } } }) => {
         });
         return data;
       } catch (err) {
-        console.log('could not load weather by city id');
+        console.error('could not load weather by city id');
         throw err;
       }
     },

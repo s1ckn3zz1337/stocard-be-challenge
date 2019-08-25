@@ -7,7 +7,11 @@ module.exports = ({ ModelCity }) => ({
   async getCityByLanLng(req, res, next) {
     const { lat, lng } = req.query;
     const cities = (await ModelCity.listAllByLngLat(lng, lat)).map((city) => city.toJSON());
-    res.send(cities);
+    if (cities.length === 0) {
+      res.send(204, []);
+    } else {
+      res.send(cities);
+    }
     return next();
   },
 

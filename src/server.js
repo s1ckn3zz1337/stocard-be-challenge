@@ -1,42 +1,69 @@
 // todo create server and register routes
-module.exports = ({ restify, routeCities, restifyErrors: { HttpError, InternalServerError } }) => {
+module.exports = ({
+  restify,
+  routeCities,
+  restifyErrors: { HttpError, InternalServerError },
+  configApp: {
+    global: { port },
+  },
+  packageJson,
+}) => {
   class Server {
+    promisifyMiddleware(handler) {
+      return (req, res, next) => {
+        Promise.resolve().then(
+          () => handler(req, res, next),
+        ).then(
+          (result) => {
+            next(result);
+          },
+          // emit error which we listen and do error handling there
+          (error) => {
+            // todo use own error code
+            this.server.emit('exceptionThrown', req, res, handler, error);
+          },
+        );
+      };
+    }
+
+    addRoutes(allRoutes) {
+      allRoutes.forEach((domainRoute) => {
+        domainRoute.forEach((singleRoute) => {
+          const asyncMiddlewares = singleRoute.middlewares.map(
+            (middleware) => this.promisifyMiddleware(middleware),
+          );
+          this.server[singleRoute.method](singleRoute.location, asyncMiddlewares);
+        });
+      });
+    }
+
     start() {
       // todo use values from package.json & add dev conf
-      const server = restify.createServer({
-        name: 'myapp',
-        version: '1.0.0',
-        handleUncaughtExceptions: true,
+      this.server = restify.createServer({
+        name: packageJson.name,
+        version: packageJson.version,
       });
 
-      server.use(restify.plugins.acceptParser(server.acceptable));
-      server.use(restify.plugins.queryParser());
-      server.use(restify.plugins.bodyParser());
-      server.on('uncaughtException', (req, res, route, err) => {
+      this.server.use(restify.plugins.acceptParser(this.server.acceptable));
+      this.server.use(restify.plugins.queryParser());
+      this.server.use(restify.plugins.bodyParser());
+      this.server.on('exceptionThrown', (req, res, route, err) => {
         // this is fired second.
-        const error = err instanceof HttpError ? err : new InternalServerError(err);
+        const error = err instanceof HttpError ? err : new InternalServerError('Hoops looks like something went wrong :(');
         res.send(error.statusCode, { message: error.message, code: error.name });
       });
 
-      this.addRoutes(server, [routeCities]);
+      this.addRoutes([routeCities]);
 
-      server.listen(8080, () => {
-        console.log('%s listening at %s', server.name, server.url);
+      this.server.listen(port, () => {
+        console.log('%s listening at %s', this.server.name, this.server.url);
       });
-      server.use((req, res, next) => {
+      this.server.use((req, res, next) => {
         res.setHeader('content-type', 'application/json');
 
         next();
       });
-      return server;
-    }
-
-    addRoutes(server, allRoutes) {
-      allRoutes.forEach((domainRoute) => {
-        domainRoute.forEach((singleRoute) => {
-          server[singleRoute.method](singleRoute.location, singleRoute.middlewares);
-        });
-      });
+      return this.server;
     }
   }
   return new Server();

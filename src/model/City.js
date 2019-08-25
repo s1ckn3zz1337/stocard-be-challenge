@@ -1,4 +1,14 @@
-module.exports = ({ externalApiOpenWeather: { getCitiesByLngLat, getWeatherByCityId }, ModelWeather }) => class City {
+module.exports = (
+  {
+    externalApiOpenWeather:
+        {
+          getCitiesByLngLat,
+          getWeatherByCityId,
+        },
+    ModelWeather,
+    restifyErrors: { NotFoundError },
+  },
+) => class City {
   static async listAllByLngLat(lng, lat) {
     const results = [];
     try {
@@ -20,12 +30,17 @@ module.exports = ({ externalApiOpenWeather: { getCitiesByLngLat, getWeatherByCit
     try {
       const cityData = await getWeatherByCityId(id);
       const weather = ModelWeather.parseFromCityData({ cityId: id, ...cityData });
-      const city = new City({
-        id: cityData.id, name: cityData.name, weather, lng: cityData.coord.lon, lat: cityData.coord.lat,
+      return new City({
+        id: cityData.id,
+        name: cityData.name,
+        weather,
+        lng: cityData.coord.lon,
+        lat: cityData.coord.lat,
       });
-      return city;
     } catch (err) {
-      console.error('error parsing cities');
+      if (err.response.status === NotFoundError.prototype.statusCode) {
+        throw new NotFoundError('not found');
+      }
       throw err;
     }
   }

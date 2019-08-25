@@ -1,4 +1,4 @@
-module.exports = ({ Joi, restifyErrors: { BadRequestError } }) => (req, res, next) => {
+module.exports = ({ Joi, restifyErrors: { BadRequestError } }) => async (req, res, next) => {
   switch (true) {
     case /\/cities\/\d*\/weather/.test(req.url):
       break;
@@ -9,7 +9,7 @@ module.exports = ({ Joi, restifyErrors: { BadRequestError } }) => (req, res, nex
         lng: Joi.number().required(),
         lat: Joi.number().required(),
       });
-      const { error, value } = citiesShema.validate(req.query);
+      const { error } = citiesShema.validate(req.query);
       if (error) {
         throw new BadRequestError('lat/lng required');
       }
