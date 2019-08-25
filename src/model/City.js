@@ -11,7 +11,7 @@ module.exports = ({ externalApiOpenWeather: { getCitiesByLngLat, getWeatherByCit
       });
       return results;
     } catch (err) {
-      console.err('error parsing cities');
+      console.error('error parsing cities');
       throw err;
     }
   }

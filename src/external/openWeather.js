@@ -15,12 +15,12 @@ module.exports = ({ axios, configApp: { openWeather: { appId } } }) => {
           params: {
             lat,
             lon: lng,
-            appId,
+            appid: appId,
           },
         });
         return data;
       } catch (err) {
-        console.err('could not load city by lng lat', err);
+        console.error('could not load city by lng lat', err);
         throw (err);
       }
     },
