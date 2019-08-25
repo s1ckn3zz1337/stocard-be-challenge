@@ -1,4 +1,4 @@
-// eslint-disable camelcase
+/* eslint-disable camelcase */
 module.exports = () => class Weather {
   static parseFromCityData({
     id, weather, sys: { sunrise, sunset }, main: {

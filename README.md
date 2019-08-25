@@ -36,10 +36,17 @@ yarn test
 yarn lint
 ```
 
+##Commiting
+
+* code quality tools running as precommit such as lintting, duplicate, tests and outdate deps
+
+```
+yarn commit
+```
+
 ## Open tasks
 
 * add proper logging (debug log every function, error log not catched errors, json output, context for loggers)
-* improve linting
 * improve func naming
 * improve error handling (add error codes, own error class et)
 * add swagger doc

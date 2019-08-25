@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 module.exports = ({ Joi, restifyErrors: { BadRequestError } }) => async (req, res, next) => {
   switch (true) {
     case /\/cities\/\d*\/weather/.test(req.url):

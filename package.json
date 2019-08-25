@@ -10,11 +10,13 @@
   "engines": {
     "node": "11.10.1"
   },
-  "eslintConfig":{"extends": "./.eslintrc"},
+  "eslintConfig": {
+    "extends": "./.eslintrc"
+  },
   "dependencies": {
     "axios": "0.19.0",
     "@hapi/joi": "15.1.1",
-    "awilix":"4.2.2",
+    "awilix": "4.2.2",
     "restify": "8.4.0",
     "restify-errors": "8.0.1",
     "winston": "3.2.1"
@@ -28,12 +30,32 @@
     "eslint-plugin-react": "7.14.3",
     "nock": "10.0.6",
     "supertest": "4.0.2",
-    "nodemon": "1.19.1"
+    "nodemon": "1.19.1",
+    "husky": "3.0.4",
+    "commitizen": "4.0.3",
+    "git-cz": "3.2.1",
+    "cz-emoji": "1.1.2",
+    "jsinspector": "2.0.4"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn outofdate && yarn lint && yarn duplicated && yarn test"
+    }
+  },
+
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-emojoi"
+    }
+  },
+
   "scripts": {
     "test": "jest ./test --coverage",
     "run": "node ./src",
     "dev": "nodemon ./src",
-    "lint": "eslint ./"
+    "lint": "eslint ./src",
+    "outofdate": "yarn outdated",
+    "commit": "git cz",
+    "duplicated": "jsinspector -t 30 ./src"
   }
 }
